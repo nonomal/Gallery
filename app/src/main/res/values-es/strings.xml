@@ -36,7 +36,7 @@
     <string name="filter_media">Filtro de medios</string>
     <string name="images">Imágenes</string>
     <string name="videos">Vídeos</string>
-    <string name="gifs">Imagenes con animación</string>
+    <string name="gifs">Imágenes con animación</string>
     <string name="raw_images">Imágenes RAW</string>
     <string name="svgs">SVG</string>
     <string name="portraits">Retratos</string>
@@ -130,7 +130,7 @@
     <string name="do_not_group_files">No agrupar</string>
     <string name="by_folder">Carpeta</string>
     <string name="by_last_modified">Fecha de modificación</string>
-    <string name="by_last_modified_daily">Fecha de modificacion (Día)</string>
+    <string name="by_last_modified_daily">Fecha de modificación (Día)</string>
     <string name="by_last_modified_monthly">Fecha de modificación (Mes)</string>
     <string name="by_date_taken">Fecha de creación</string>
     <string name="by_date_taken_daily">Fecha de creación (día)</string>
@@ -211,7 +211,7 @@
     <string name="manage_bottom_actions">Administrar los botones de la parte inferior</string>
     <string name="toggle_favorite">Alternar favorito</string>
     <string name="toggle_file_visibility">Alternar visibilidad del archivo</string>
-    <string name="faq_2_title">He protegido la aplicación con una contraseña, pero la he olvidado. ¿Que puedo hacer\?</string>
+    <string name="faq_2_title">He protegido la aplicación con una contraseña, pero la he olvidado. ¿Qué puedo hacer\?</string>
     <string name="faq_2_text">Puede resolverlo de 2 maneras. Puede reinstalar la aplicación o encontrar la aplicación en la configuración de su dispositivo y seleccionar \"Borrar datos \". Restablecerá todas sus configuraciones, no eliminará ningún archivo multimedia.</string>
     <string name="faq_3_title">¿Cómo puedo hacer que un álbum siempre aparezca en la parte superior\?</string>
     <string name="faq_3_text">Puede mantener pulsado el álbum deseado y seleccionar el icono Pin en el menú de acción, que lo fijará en la parte superior. También puede anclar varias carpetas, los artículos fijados se ordenarán por el método de clasificación predeterminado.</string>
@@ -251,4 +251,11 @@
 \nSi desea ocultarlas también de otras aplicaciones, utilice la función Ocultar.</string>
     <string name="faq_1_text">Primero tienes que encontrar la galería actualmente por defecto en la sección de Aplicaciones de la configuración de tu dispositivo, busca un botón que diga algo así como \"Abrir por defecto\", haz clic en él y luego selecciona \"Borrar valores predeterminados\". La próxima vez que intentes abrir una imagen o un vídeo deberías ver un selector de aplicaciones, donde puedes seleccionar Galería de Fossify y convertirla en la aplicación predeterminada.</string>
     <string name="faq_5_text">Excluir evita que la carpeta se muestre sólo en la Galería de Fossify, mientras que Ocultar funciona a nivel de sistema y oculta la carpeta de otras galerías también. Funciona mediante la creación de un archivo vacío \".nomedia\" en la carpeta dada, que luego se puede eliminar con cualquier gestor de archivos también. Ten en cuenta que algunos dispositivos no permiten ocultar carpetas como Cámara, Capturas de pantalla y Descargas.</string>
+    <string name="editor">Editor</string>
+    <string name="full_storage_permission_required">La galería de Fossify necesita acceso total para mostrar todas tus fotos y videos. Ve a Configuración &gt; Permisos &gt; Fotos y videos &gt; Permitir todo.</string>
+    <string name="playback_speed">Velocidad de reproducción</string>
+    <string name="failed_to_load_media">Error al cargar el medio.</string>
+    <string name="media_exceeds_device_capabilities">Los medios superan las capacidades del dispositivo.</string>
+    <string name="file_is_malformed_or_corrupted">El archivo está malformado o dañado.</string>
+    <string name="unsupported_format">Formato no soportado.</string>
 </resources>

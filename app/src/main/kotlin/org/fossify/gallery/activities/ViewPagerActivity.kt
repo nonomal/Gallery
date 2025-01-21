@@ -10,14 +10,12 @@ import android.content.pm.ActivityInfo
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.content.res.Configuration
-import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Icon
 import android.os.Bundle
 import android.os.Handler
-import android.provider.MediaStore.Images
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
@@ -59,7 +57,10 @@ import kotlin.math.min
 
 @Suppress("UNCHECKED_CAST")
 class ViewPagerActivity : SimpleActivity(), ViewPager.OnPageChangeListener, ViewPagerFragment.FragmentListener {
-    private val REQUEST_VIEW_VIDEO = 1
+    companion object {
+        private const val REQUEST_VIEW_VIDEO = 1
+        private const val SAVED_PATH = "current_path"
+    }
 
     private var mPath = ""
     private var mDirectory = ""
@@ -96,13 +97,10 @@ class ViewPagerActivity : SimpleActivity(), ViewPager.OnPageChangeListener, View
         checkNotchSupport()
         (MediaActivity.mMedia.clone() as ArrayList<ThumbnailItem>).filterIsInstanceTo(mMediaFiles, Medium::class.java)
 
-        handlePermission(getPermissionToRequest()) {
-            if (it) {
-                initViewPager()
-            } else {
-                toast(org.fossify.commons.R.string.no_storage_permissions)
-                finish()
-            }
+        requestMediaPermissions {
+            initViewPager(
+                savedPath = savedInstanceState?.getString(SAVED_PATH).orEmpty()
+            )
         }
 
         initFavorites()
@@ -191,7 +189,7 @@ class ViewPagerActivity : SimpleActivity(), ViewPager.OnPageChangeListener, View
                     currentMedium.isFavorite && visibleBottomActions and BOTTOM_ACTION_TOGGLE_FAVORITE == 0 && !currentMedium.getIsInRecycleBin()
 
                 findItem(R.id.menu_restore_file).isVisible = currentMedium.path.startsWith(recycleBinPath)
-                findItem(R.id.menu_create_shortcut).isVisible = isOreoPlus()
+                findItem(R.id.menu_create_shortcut).isVisible = true
                 findItem(R.id.menu_change_orientation).isVisible = rotationDegrees == 0 && visibleBottomActions and BOTTOM_ACTION_CHANGE_ORIENTATION == 0
                 findItem(R.id.menu_change_orientation).icon = resources.getDrawable(getChangeOrientationIcon())
                 findItem(R.id.menu_rotate).setShowAsAction(
@@ -284,22 +282,18 @@ class ViewPagerActivity : SimpleActivity(), ViewPager.OnPageChangeListener, View
         (binding.mediumViewerAppbar.layoutParams as RelativeLayout.LayoutParams).topMargin = statusBarHeight
     }
 
-    private fun initViewPager() {
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(SAVED_PATH, getCurrentPath())
+    }
+
+    private fun initViewPager(savedPath: String) {
         val uri = intent.data
         if (uri != null) {
-            var cursor: Cursor? = null
-            try {
-                val proj = arrayOf(Images.Media.DATA)
-                cursor = contentResolver.query(uri, proj, null, null, null)
-                if (cursor?.moveToFirst() == true) {
-                    mPath = cursor.getStringValue(Images.Media.DATA)
-                }
-            } finally {
-                cursor?.close()
-            }
+            mPath = savedPath.ifEmpty { getDataColumn(uri).orEmpty() }
         } else {
             try {
-                mPath = intent.getStringExtra(PATH) ?: ""
+                mPath = savedPath.ifEmpty { intent.getStringExtra(PATH).orEmpty() }
 
                 // make sure "Open Recycle Bin" works well with "Show all folders content"
                 mShowAll = config.showAll && (mPath.isNotEmpty() && !mPath.startsWith(recycleBinPath))
@@ -310,7 +304,7 @@ class ViewPagerActivity : SimpleActivity(), ViewPager.OnPageChangeListener, View
             }
         }
 
-        if (intent.extras?.containsKey(REAL_FILE_PATH) == true) {
+        if (savedPath.isEmpty() && intent.extras?.containsKey(REAL_FILE_PATH) == true) {
             mPath = intent.extras!!.getString(REAL_FILE_PATH)!!
         }
 
@@ -406,7 +400,9 @@ class ViewPagerActivity : SimpleActivity(), ViewPager.OnPageChangeListener, View
         }
 
         window.decorView.setOnSystemUiVisibilityChangeListener { visibility ->
-            mIsFullScreen = if (isNougatPlus() && isInMultiWindowMode) {
+            mIsFullScreen = if (isUpsideDownCakePlus()) {
+                visibility and View.SYSTEM_UI_FLAG_LOW_PROFILE != 0
+            } else if (isInMultiWindowMode) {
                 visibility and View.SYSTEM_UI_FLAG_LOW_PROFILE != 0
             } else if (visibility and View.SYSTEM_UI_FLAG_LOW_PROFILE == 0) {
                 false
@@ -760,10 +756,6 @@ class ViewPagerActivity : SimpleActivity(), ViewPager.OnPageChangeListener, View
     }
 
     private fun createShortcut() {
-        if (!isOreoPlus()) {
-            return
-        }
-
         val manager = getSystemService(ShortcutManager::class.java)
         if (manager.isRequestPinShortcutSupported) {
             val medium = getCurrentMedium() ?: return
@@ -1026,7 +1018,7 @@ class ViewPagerActivity : SimpleActivity(), ViewPager.OnPageChangeListener, View
                         model: Any,
                         target: Target<Bitmap>,
                         dataSource: DataSource,
-                        isFirstResource: Boolean
+                        isFirstResource: Boolean,
                     ): Boolean {
                         printHelper.printBitmap(path.getFilenameFromPath(), bitmap)
                         return false
